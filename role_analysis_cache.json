@@ -1,0 +1,143 @@
+{
+  "": {
+    "analysis": {
+      "role_title": "Product Manager (Technical/Growth)",
+      "role_description": "Strategic product leadership role responsible for defining product vision, roadmap and features while working with engineering teams to deliver market-driven solutions",
+      "required_skills": [
+        "Product strategy & roadmapping",
+        "User research & customer insight analysis",
+        "Data analysis & metrics tracking",
+        "Agile/Scrum methodologies",
+        "Stakeholder management",
+        "Requirements gathering & documentation",
+        "Problem-solving",
+        "Communication & presentation",
+        "Project management",
+        "Business analysis"
+      ],
+      "preferred_skills": [
+        "Technical background or understanding",
+        "UX/UI knowledge",
+        "A/B testing",
+        "Growth hacking",
+        "Market analysis",
+        "SQL",
+        "Product analytics"
+      ],
+      "technologies": [
+        "JIRA",
+        "Confluence",
+        "Product analytics tools (Mixpanel/Amplitude)",
+        "Figma/Sketch",
+        "Excel/Spreadsheets",
+        "SQL databases",
+        "Tableau/Data visualization tools",
+        "Productboard/Aha!"
+      ],
+      "experience_level": "mid_level|senior",
+      "typical_industries": [
+        "Technology/Software",
+        "E-commerce",
+        "Financial Services",
+        "Healthcare Technology",
+        "Enterprise Software",
+        "Consumer Internet",
+        "B2B SaaS"
+      ],
+      "key_responsibilities": [
+        "Define product strategy and vision",
+        "Create and maintain product roadmap",
+        "Conduct market research and competitive analysis",
+        "Gather and prioritize product requirements",
+        "Work closely with engineering teams",
+        "Drive product growth metrics",
+        "Manage stakeholder relationships",
+        "Define and track success metrics",
+        "Lead product discovery and delivery"
+      ],
+      "certifications": [
+        "Scrum Product Owner (CSPO)",
+        "Product Management Certification (PMC)",
+        "Agile Certified Practitioner (PMI-ACP)",
+        "Product Management (General Assembly)",
+        "Growth Product Management (Reforge)"
+      ]
+    },
+    "keywords": [
+      "product manager",
+      "technical product manager",
+      "senior product manager",
+      "growth product manager"
+    ],
+    "cached_at": "2025-08-01T10:33:34.100109"
+  },
+  "a4053ee2cdf5fddcdc3614cc20fb5c0f": {
+    "analysis": {
+      "role_title": "Product Manager (Technical/Growth)",
+      "role_description": "Strategic product leadership role responsible for defining product vision, roadmap and features while working with engineering teams to deliver market-driven solutions",
+      "required_skills": [
+        "Product strategy & roadmapping",
+        "User research & customer insights",
+        "Data analysis & metrics",
+        "Agile/Scrum methodologies",
+        "Stakeholder management",
+        "Requirements gathering",
+        "Problem-solving",
+        "Communication",
+        "Project management",
+        "Business analysis"
+      ],
+      "preferred_skills": [
+        "Technical background/understanding",
+        "Growth hacking",
+        "A/B testing",
+        "Market analysis",
+        "UX/UI knowledge",
+        "SQL",
+        "Product analytics"
+      ],
+      "technologies": [
+        "JIRA/Confluence",
+        "Product analytics tools (Mixpanel/Amplitude)",
+        "Figma/Sketch",
+        "Excel/Spreadsheets",
+        "SQL databases",
+        "Tableau/Data visualization tools",
+        "Prototyping tools"
+      ],
+      "experience_level": "mid_level|senior",
+      "typical_industries": [
+        "Technology/Software",
+        "E-commerce",
+        "SaaS",
+        "Financial Technology",
+        "Consumer Internet",
+        "Enterprise Software"
+      ],
+      "key_responsibilities": [
+        "Define product strategy and vision",
+        "Create and maintain product roadmap",
+        "Conduct market research and competitive analysis",
+        "Gather and prioritize requirements",
+        "Work with engineering teams on implementation",
+        "Track and analyze product metrics",
+        "Drive growth initiatives",
+        "Coordinate cross-functional teams"
+      ],
+      "certifications": [
+        "Scrum Product Owner (CSPO)",
+        "Product Management Certification (PMC)",
+        "Agile Certified Practitioner (PMI-ACP)",
+        "Product Management (General Assembly)",
+        "Growth Product Management (Reforge)"
+      ]
+    },
+    "keywords": [
+      "product manager",
+      "technical product manager",
+      "senior product manager",
+      "growth product manager"
+    ],
+    "cached_at": "2025-08-01T10:38:32.761685"
+  }
+}

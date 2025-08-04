@@ -1,0 +1,130 @@
+{
+  "resume.pdf": {
+    "analysis": {
+      "skills": [
+        "product strategy",
+        "growth strategy",
+        "product roadmap development",
+        "A/B testing",
+        "data analytics",
+        "stakeholder management",
+        "cross-functional leadership",
+        "user research",
+        "market research",
+        "product lifecycle management",
+        "sprint planning",
+        "backlog management",
+        "requirements gathering",
+        "go-to-market strategy",
+        "experimentation",
+        "customer discovery",
+        "product launch",
+        "technical product management",
+        "survey design",
+        "metrics & KPIs"
+      ],
+      "experience_level": "mid_level",
+      "has_remote_experience": true,
+      "has_management_experience": true,
+      "years_of_experience": 7,
+      "key_achievements": [
+        "Increased DAU by 8.9% for key Windows segment through first-run onboarding optimization",
+        "Led product strategy for Firefox Desktop (55M DAU)",
+        "Launched add-ons recommendation system reaching 18M users",
+        "Drove strategic pivot to retention focus through customer research insights",
+        "Led 0-1 new product development for productivity browser"
+      ],
+      "relevant_industries": [
+        "Web Browsers",
+        "Consumer Technology",
+        "Developer Tools",
+        "Open Source Software"
+      ],
+      "strengths": [
+        "Technical background with engineering experience",
+        "Data-driven decision making",
+        "Cross-functional team leadership",
+        "Growth product management",
+        "Customer research and insights",
+        "Product experimentation"
+      ],
+      "areas_for_growth": [
+        "B2B product experience",
+        "Monetization strategy",
+        "Direct revenue responsibility",
+        "People management experience"
+      ],
+      "overall_assessment": "Strong technical PM with proven growth experience at major tech companies. Technical background and mix of 0-1 and growth product experience makes them well-suited for technical PM or growth PM roles at consumer technology companies."
+    },
+    "metadata": {
+      "size": 112954,
+      "mtime": 1754012446.0146587,
+      "hash": "4b1c7bb4ae78fa33bb6a597d7716b6d2"
+    },
+    "cached_at": "2025-08-01T10:03:56.662515"
+  },
+  "/Users/najlabulous/Documents/Job Hunt/resume.pdf": {
+    "analysis": {
+      "skills": [
+        "product strategy",
+        "growth strategy",
+        "product roadmap development",
+        "A/B testing",
+        "data analytics",
+        "stakeholder management",
+        "cross-functional leadership",
+        "user research",
+        "market research",
+        "product lifecycle management",
+        "sprint planning",
+        "backlog management",
+        "requirements gathering",
+        "GTM strategy",
+        "feature prioritization",
+        "experimentation",
+        "customer discovery",
+        "technical product management",
+        "product metrics & KPIs",
+        "survey design"
+      ],
+      "experience_level": "mid_level",
+      "has_remote_experience": true,
+      "has_management_experience": true,
+      "years_of_experience": 7,
+      "key_achievements": [
+        "Increased DAU by 8.9% for key Windows segment through first-run onboarding optimization",
+        "Led product strategy for Firefox Desktop (55M DAU) onboarding",
+        "Launched add-ons recommendation system reaching 18M users",
+        "Drove strategic pivot to retention focus through customer research insights",
+        "Led 0-1 new product development for productivity browser"
+      ],
+      "relevant_industries": [
+        "Consumer Technology",
+        "Web Browsers",
+        "Developer Tools",
+        "Software Development"
+      ],
+      "strengths": [
+        "Technical background with engineering experience",
+        "Data-driven decision making",
+        "Cross-functional team leadership",
+        "Growth product management",
+        "Customer research and insights",
+        "Technical product development"
+      ],
+      "areas_for_growth": [
+        "B2B product experience",
+        "Monetization strategy",
+        "Direct revenue responsibility",
+        "People management experience"
+      ],
+      "overall_assessment": "Strong technical PM with proven growth experience at major tech companies. Technical background and demonstrated ability to drive metrics make them particularly well-suited for technical PM or growth PM roles at consumer technology companies."
+    },
+    "metadata": {
+      "size": 112954,
+      "mtime": 1754012432.1244774,
+      "hash": "4b1c7bb4ae78fa33bb6a597d7716b6d2"
+    },
+    "cached_at": "2025-08-04T10:18:07.944635"
+  }
+}
