@@ -37,8 +37,7 @@ TARGET_COMPANIES = [
 # ["Consumer Technology", "Developer Tools", "Open Source", "AI/ML"]
 # ["Gaming", "Entertainment", "Media", "Education"]
 PREFERRED_INDUSTRIES = [
-    "Technology", "Software", "SaaS", "Consumer Technology", "Developer Tools", 
-    "Open Source", "AI/ML", "Fintech", "E-commerce"
+    "Technology", "Software", "SaaS", "Fintech", "Healthcare", "E-commerce"
 ]
 
 # INDUSTRIES TO AVOID - Industries you're not interested in
@@ -47,7 +46,7 @@ PREFERRED_INDUSTRIES = [
 # ["Insurance", "Real Estate", "Manufacturing", "Retail"]
 # ["Healthcare", "Government", "Non-profit"]
 INDUSTRIES_TO_AVOID = [
-    "Insurance", "Real Estate", "Manufacturing", "Healthcare", "Government"
+    "Insurance", "Real Estate", "Manufacturing", "Retail"
 ]
 
 # SEARCH SETTINGS
