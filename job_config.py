@@ -83,4 +83,8 @@ SAVED_JOBS_DIR = "./saved_jobs"  # Directory to save job results
 REMOTE_INDICATORS = [
     "remote", "work from home", "wfh", "virtual", "anywhere", 
     "united states", "us", "usa"
-] 
+]
+
+# HIDDEN JOBS - Jobs to hide from future results
+# This file stores job IDs that you want to hide from future searches
+HIDDEN_JOBS_FILE = "./hidden_jobs.json"  # File to store hidden job IDs 

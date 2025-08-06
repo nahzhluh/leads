@@ -11,6 +11,7 @@ The system will:
 4. **Rank them by how well they match your background and industry preferences** - Compares job requirements with your resume and preferences
 5. **Show you the best opportunities first with detailed reasoning** - Displays jobs ranked by match quality (High/Medium/Low) with confidence scores
 6. **Save jobs of interest**: Option to save jobs and generate personalized resumes
+7. **Hide jobs from future results**: Option to hide jobs you're not interested in to focus on new opportunities
 
 ## 🎯 Quick Start
 

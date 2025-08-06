@@ -13,7 +13,7 @@ import json
 import anthropic
 import hashlib
 from claude_resume_analyzer import analyze_resume_file, read_resume_file
-from job_config import KEYWORDS, LOCATIONS, TARGET_COMPANIES, PREFERRED_INDUSTRIES, INDUSTRIES_TO_AVOID, MAX_JOBS_PER_SEARCH, SEARCH_DELAY, SEARCH_TIME_PERIOD, RESUME_PATH, SAVED_JOBS_DIR, REMOTE_INDICATORS
+from job_config import KEYWORDS, LOCATIONS, TARGET_COMPANIES, PREFERRED_INDUSTRIES, INDUSTRIES_TO_AVOID, MAX_JOBS_PER_SEARCH, SEARCH_DELAY, SEARCH_TIME_PERIOD, RESUME_PATH, SAVED_JOBS_DIR, REMOTE_INDICATORS, HIDDEN_JOBS_FILE
 
 # Cache configuration
 CACHE_FILE = "job_analysis_cache.json"
@@ -128,10 +128,63 @@ def get_cache_stats():
         print(f"⚠️  Error getting cache stats: {e}")
         return {"total_entries": 0, "cache_size_mb": 0}
 
+def load_hidden_jobs():
+    """Load the list of hidden job IDs"""
+    if not os.path.exists(HIDDEN_JOBS_FILE):
+        return set()
+    
+    try:
+        with open(HIDDEN_JOBS_FILE, 'r', encoding='utf-8') as f:
+            hidden_jobs = json.load(f)
+        return set(hidden_jobs)
+    except Exception as e:
+        print(f"⚠️  Error loading hidden jobs: {e}")
+        return set()
+
+def save_hidden_jobs(hidden_jobs):
+    """Save the list of hidden job IDs"""
+    try:
+        with open(HIDDEN_JOBS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(list(hidden_jobs), f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        print(f"⚠️  Error saving hidden jobs: {e}")
+
+def hide_job(job, hidden_jobs):
+    """Add a job to the hidden jobs list"""
+    job_key = generate_job_cache_key(job)
+    hidden_jobs.add(job_key)
+    save_hidden_jobs(hidden_jobs)
+    print(f"🚫 Hidden job: {job['title']} at {job['company']}")
+
+def is_job_hidden(job, hidden_jobs):
+    """Check if a job is in the hidden jobs list"""
+    job_key = generate_job_cache_key(job)
+    return job_key in hidden_jobs
+
+def filter_hidden_jobs(jobs, hidden_jobs):
+    """Filter out hidden jobs from the list"""
+    filtered_jobs = []
+    hidden_count = 0
+    
+    for job in jobs:
+        if is_job_hidden(job, hidden_jobs):
+            hidden_count += 1
+        else:
+            filtered_jobs.append(job)
+    
+    if hidden_count > 0:
+        print(f"🚫 Filtered out {hidden_count} hidden jobs")
+    
+    return filtered_jobs
+
 def analyze_role_with_claude(keywords, api_key):
     """Use Claude to analyze what role the keywords represent and what skills are needed"""
     
     client = anthropic.Anthropic(api_key=api_key)
+    
+    # Retry configuration
+    max_retries = 3
+    base_delay = 2  # seconds
     
     prompt = f"""
 You are an expert job market analyst. Based on the provided job search keywords, determine:
@@ -186,42 +239,61 @@ Guidelines:
 Return ONLY the JSON response, no additional text.
 """
     
-    try:
-        response = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
-            max_tokens=2000,
-            temperature=0.1,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
-        )
-        
-        content = response.content[0].text
-        
-        # Try to parse the JSON response
+    # Retry loop
+    for attempt in range(max_retries):
         try:
-            role_analysis = json.loads(content)
-            return role_analysis
-        except json.JSONDecodeError:
-            print("❌ Claude returned invalid JSON. Trying to extract JSON...")
-            json_match = re.search(r'\{.*\}', content, re.DOTALL)
-            if json_match:
-                try:
-                    role_analysis = json.loads(json_match.group())
-                    return role_analysis
-                except json.JSONDecodeError:
-                    print("❌ Could not parse Claude's response")
+            response = client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=2000,
+                temperature=0.1,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            )
+            
+            content = response.content[0].text
+            
+            # Try to parse the JSON response
+            try:
+                role_analysis = json.loads(content)
+                return role_analysis
+            except json.JSONDecodeError:
+                print("❌ Claude returned invalid JSON. Trying to extract JSON...")
+                json_match = re.search(r'\{.*\}', content, re.DOTALL)
+                if json_match:
+                    try:
+                        role_analysis = json.loads(json_match.group())
+                        return role_analysis
+                    except json.JSONDecodeError:
+                        print("❌ Could not parse Claude's response")
+                        return None
+                else:
+                    print("❌ No JSON found in Claude's response")
+                    return None
+                    
+        except Exception as e:
+            error_message = str(e)
+            print(f"❌ Error calling Claude API (attempt {attempt + 1}/{max_retries}): {e}")
+            
+            # Check if it's a retryable error
+            if "overloaded" in error_message.lower() or "529" in error_message or "rate limit" in error_message.lower():
+                if attempt < max_retries - 1:
+                    delay = base_delay * (2 ** attempt)  # Exponential backoff
+                    print(f"⏳ API overloaded. Retrying in {delay} seconds...")
+                    time.sleep(delay)
+                    continue
+                else:
+                    print("❌ Max retries reached. API is still overloaded.")
                     return None
             else:
-                print("❌ No JSON found in Claude's response")
+                # Non-retryable error
+                print("❌ Non-retryable error encountered.")
                 return None
-                
-    except Exception as e:
-        print(f"❌ Error calling Claude API: {e}")
-        return None
+    
+    return None
 
 
 
@@ -459,52 +531,75 @@ Be realistic and honest in your assessment. Consider both the candidate's streng
 Return ONLY the JSON response, no additional text.
 """
     
-    try:
-        response = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
-            max_tokens=1000,
-            temperature=0.1,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
-        )
-        
-        content = response.content[0].text
-        
-        # Try to parse the JSON response
+    # Retry configuration
+    max_retries = 3
+    base_delay = 2  # seconds
+    
+    # Retry loop
+    for attempt in range(max_retries):
         try:
-            analysis = json.loads(content)
+            response = client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=1000,
+                temperature=0.1,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            )
             
-            # Cache the successful analysis
-            if cache_data is not None:
-                cache_job_analysis(job, analysis, cache_data)
+            content = response.content[0].text
             
-            return analysis
-        except json.JSONDecodeError:
-            print(f"❌ Claude returned invalid JSON for job matching. Trying to extract JSON...")
-            json_match = re.search(r'\{.*\}', content, re.DOTALL)
-            if json_match:
-                try:
-                    analysis = json.loads(json_match.group())
+            # Try to parse the JSON response
+            try:
+                analysis = json.loads(content)
+                
+                # Cache the successful analysis
+                if cache_data is not None:
+                    cache_job_analysis(job, analysis, cache_data)
+                
+                return analysis
+            except json.JSONDecodeError:
+                print(f"❌ Claude returned invalid JSON for job matching. Trying to extract JSON...")
+                json_match = re.search(r'\{.*\}', content, re.DOTALL)
+                if json_match:
+                    try:
+                        analysis = json.loads(json_match.group())
+                        
+                        # Cache the successful analysis
+                        if cache_data is not None:
+                            cache_job_analysis(job, analysis, cache_data)
+                        
+                        return analysis
+                    except json.JSONDecodeError:
+                        print(f"❌ Could not parse Claude's job matching response")
+                        return None
+                else:
+                    print(f"❌ No JSON found in Claude's job matching response")
+                    return None
                     
-                    # Cache the successful analysis
-                    if cache_data is not None:
-                        cache_job_analysis(job, analysis, cache_data)
-                    
-                    return analysis
-                except json.JSONDecodeError:
-                    print(f"❌ Could not parse Claude's job matching response")
+        except Exception as e:
+            error_message = str(e)
+            print(f"❌ Error calling Claude API for job matching (attempt {attempt + 1}/{max_retries}): {e}")
+            
+            # Check if it's a retryable error
+            if "overloaded" in error_message.lower() or "529" in error_message or "rate limit" in error_message.lower():
+                if attempt < max_retries - 1:
+                    delay = base_delay * (2 ** attempt)  # Exponential backoff
+                    print(f"⏳ API overloaded. Retrying in {delay} seconds...")
+                    time.sleep(delay)
+                    continue
+                else:
+                    print("❌ Max retries reached. API is still overloaded.")
                     return None
             else:
-                print(f"❌ No JSON found in Claude's job matching response")
+                # Non-retryable error
+                print("❌ Non-retryable error encountered.")
                 return None
-                
-    except Exception as e:
-        print(f"❌ Error calling Claude API for job matching: {e}")
-        return None
+    
+    return None
 
 def analyze_job_match(job, resume_analysis, role_analysis, api_key, cache_data=None):
     """Analyze how well a job matches your resume using Claude"""
@@ -563,6 +658,16 @@ def display_jobs(jobs, role_analysis):
     """Display jobs in a nice format"""
     if not jobs:
         print("❌ No fresh jobs found in the last 24 hours.")
+        return
+    
+    # Load hidden jobs
+    hidden_jobs = load_hidden_jobs()
+    
+    # Filter out hidden jobs
+    jobs = filter_hidden_jobs(jobs, hidden_jobs)
+    
+    if not jobs:
+        print("❌ No fresh jobs found after filtering hidden jobs.")
         return
     
     print(f"\n✅ Found {len(jobs)} fresh {role_analysis.get('role_title', 'job')} positions:")
@@ -673,9 +778,10 @@ def display_jobs(jobs, role_analysis):
     
     print(f"\n✨ Done! Found {len(jobs)} total jobs.")
     
-    # Interactive job saving
+    # Interactive job saving and hiding
     if jobs:
         save_selected_jobs(jobs)
+        hide_selected_jobs(jobs)
 
 def generate_customized_resume(job, api_key):
     """Generate a customized resume for a specific job using Claude"""
@@ -724,21 +830,50 @@ Please provide the complete customized resume in a clean, professional format su
 
 RESPONSE FORMAT: Return only the customized resume text, formatted professionally with clear sections (Summary, Experience, Skills, etc.)."""
 
-        # Call Claude API
+        # Call Claude API with retry logic
         client = anthropic.Anthropic(api_key=api_key)
-        response = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
-            max_tokens=4000,
-            temperature=0.3,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
-        )
         
-        return response.content[0].text
+        # Retry configuration
+        max_retries = 3
+        base_delay = 2  # seconds
+        
+        # Retry loop
+        for attempt in range(max_retries):
+            try:
+                response = client.messages.create(
+                    model="claude-3-5-sonnet-20241022",
+                    max_tokens=4000,
+                    temperature=0.3,
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": prompt
+                        }
+                    ]
+                )
+                
+                return response.content[0].text
+                
+            except Exception as e:
+                error_message = str(e)
+                print(f"❌ Error generating customized resume (attempt {attempt + 1}/{max_retries}): {e}")
+                
+                # Check if it's a retryable error
+                if "overloaded" in error_message.lower() or "529" in error_message or "rate limit" in error_message.lower():
+                    if attempt < max_retries - 1:
+                        delay = base_delay * (2 ** attempt)  # Exponential backoff
+                        print(f"⏳ API overloaded. Retrying in {delay} seconds...")
+                        time.sleep(delay)
+                        continue
+                    else:
+                        print("❌ Max retries reached. API is still overloaded.")
+                        return None
+                else:
+                    # Non-retryable error
+                    print("❌ Non-retryable error encountered.")
+                    return None
+        
+        return None
         
     except Exception as e:
         print(f"Error generating customized resume: {e}")
@@ -874,6 +1009,71 @@ def save_selected_jobs(jobs):
         
     except Exception as e:
         print(f"❌ Error saving jobs: {e}")
+
+def hide_selected_jobs(jobs):
+    """Interactive function to hide selected jobs from future results"""
+    if not jobs:
+        return
+    
+    print(f"\n🚫 Hide jobs from future results? (y/n): ", end="")
+    hide_choice = input().strip().lower()
+    
+    if hide_choice not in ['y', 'yes']:
+        print("📝 No jobs hidden.")
+        return
+    
+    print(f"\n✨ Found {len(jobs)} total jobs.")
+    print("Enter job numbers to hide (comma-separated, e.g., 1,3,7-9, or 'all'): ", end="")
+    job_selection = input().strip()
+    
+    if not job_selection:
+        print("❌ No jobs selected.")
+        return
+    
+    # Load hidden jobs
+    hidden_jobs = load_hidden_jobs()
+    
+    # Parse job selection
+    selected_jobs = []
+    
+    if job_selection.lower() == 'all':
+        selected_jobs = jobs
+    else:
+        try:
+            # Parse comma-separated numbers and ranges
+            for part in job_selection.split(','):
+                part = part.strip()
+                if '-' in part:
+                    # Handle ranges like "1-5"
+                    start, end = map(int, part.split('-'))
+                    for job_num in range(start, end + 1):
+                        job = next((j for j in jobs if j.get('job_number') == job_num), None)
+                        if job:
+                            selected_jobs.append(job)
+                else:
+                    # Handle single numbers
+                    job_num = int(part)
+                    job = next((j for j in jobs if j.get('job_number') == job_num), None)
+                    if job:
+                        selected_jobs.append(job)
+        except ValueError:
+            print("❌ Invalid input. Please enter valid job numbers.")
+            return
+    
+    if not selected_jobs:
+        print("❌ No valid jobs selected.")
+        return
+    
+    # Hide the selected jobs
+    hidden_count = 0
+    for job in selected_jobs:
+        if not is_job_hidden(job, hidden_jobs):
+            hide_job(job, hidden_jobs)
+            hidden_count += 1
+        else:
+            print(f"⚠️  Job {job.get('job_number')} already hidden: {job['title']} at {job['company']}")
+    
+    print(f"✅ Hidden {hidden_count} jobs from future results")
 
 def main():
     """Main function"""

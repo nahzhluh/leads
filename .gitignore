@@ -44,4 +44,7 @@ Thumbs.db
 
 # Saved job files (optional - remove if you want to track them)
 saved_jobs/
-selected_jobs_*.txt 
+selected_jobs_*.txt
+
+# Hidden jobs file (contains personal job preferences)
+hidden_jobs.json 
